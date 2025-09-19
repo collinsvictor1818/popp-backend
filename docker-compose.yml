@@ -1,0 +1,23 @@
+services:
+  db:
+    image: postgres  # Uses the official PostgreSQL image from Docker Hub
+    restart: always  # Always restart the container if it stops
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}  # Sets the PostgreSQL password from an environment variable
+    ports:
+      - "5432:5432"  # Maps port 5432 on the host to port 5432 on the container
+    volumes:
+      - postgres-data:/var/lib/postgresql/data  # Persists PostgreSQL data in a Docker volume
+
+  app:
+    build: .  # Builds the app service from the Dockerfile in the current directory
+    restart: always  # Always restart the container if it stops
+    ports:
+      - "3000:3000"  # Maps port 3000 on the host to port 3000 on the container
+    depends_on:
+      - db  # Ensures the db service is started before the app service
+    environment:
+      DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@db:5432/postgres  # Sets the database URL for the app
+
+volumes:
+  postgres-data:  # Defines a named volume for persisting PostgreSQL data

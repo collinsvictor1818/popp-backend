@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x", "darwin-arm64"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Conversation {
+  id          String             @id @default(uuid())
+  candidateId String
+  jobId       String
+  status      ConversationStatus
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  candidate Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+
+  @@unique([candidateId, jobId])
+}
+
+enum ConversationStatus {
+  CREATED
+  ONGOING
+  COMPLETED
+}
+
+model Candidate {
+  id           String @id
+  phoneNumber  String
+  firstName    String
+  lastName     String
+  emailAddress String
+
+  conversations Conversation[]
+}

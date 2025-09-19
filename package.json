@@ -1,0 +1,36 @@
+{
+  "name": "popp-backend-coding-exercise",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": {
+    "name": "Uncle Abshir 👴🏾",
+    "email": "abshir@joinpopp.com"
+  },
+  "scripts": {
+    "start": "node dist/bundle.js",
+    "dev": "ts-node-dev -r tsconfig-paths/register src/server.ts",
+    "build": "webpack",
+    "build:start": "docker compose up --build -d",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:migrate:deploy": "prisma migrate deploy",
+    "prisma:studio": "prisma studio"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.19.1",
+    "express": "^4.20.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.5.4",
+    "prisma": "^5.19.1",
+    "ts-loader": "^9.5.1",
+    "ts-node-dev": "^2.0.0",
+    "tsconfig-paths": "^4.2.0",
+    "tsconfig-paths-webpack-plugin": "^4.1.0",
+    "typescript": "^5.6.2",
+    "webpack": "^5.94.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-node-externals": "^3.0.0"
+  }
+}
