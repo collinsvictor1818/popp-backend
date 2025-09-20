@@ -1,5 +1,7 @@
 // src/utils/validation.ts
 
+import { z } from 'zod';
+
 /**
  * Validates a phone number based on a basic international format.
  * Assumes format: +<country_code><number> (e.g., +1234567890)
@@ -25,3 +27,19 @@ export function isValidPhoneNumber(phoneNumber: string): boolean {
 
   return phoneRegex.test(phoneNumber);
 }
+
+// Schema for the nested Candidate object within the webhook payload
+export const CandidateSchema = z.object({
+  phone_number: z.string().min(7).max(18), // Basic length validation
+  first_name: z.string().min(1),
+  last_name: z.string().min(1),
+  email_address: z.string().email(),
+});
+
+// Schema for the main ApplicationEvent webhook payload
+export const ApplicationEventSchema = z.object({
+  id: z.string().min(1), // Application ID
+  job_id: z.string().min(1), // Associated Job ID
+  candidate_id: z.string().min(1), // Candidate ID
+  candidate: CandidateSchema, // Nested candidate object
+});
