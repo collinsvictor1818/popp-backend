@@ -7,7 +7,7 @@ This project is a template for a backend system designed to streamline recruitme
 To create a new project using this template:
 
 1. Navigate to the GitHub
-   repository: [https://github.com/AtlasNft/popp-backend-coding-exercise](https://github.com/AtlasNft/popp-backend-coding-exercise)
+   repository: [https://github.com/collinsvictor1818/popp-backend](https://github.com/collinsvictor1818/popp-backend)
 
 2. Click on the "Use this template" button near the top-right of the page.
 
@@ -47,17 +47,11 @@ Before you begin, ensure you have the following installed on your system:
 
 3. Create a `.env` file in the root directory and add the following environment variables:
    ```
-<<<<<<< HEAD
    POSTGRES_PASSWORD=your_postgres_password
    DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@localhost:5432/postgres
    API_KEY=your_api_key_here
    SKIP_API_KEY_VALIDATION=false
    NODE_ENV=development
-=======
-   POSTGRES_PASSWORD="your_postgres_password" # e.g., "password"
-   DATABASE_URL="postgres://postgres:${POSTGRES_PASSWORD}@localhost:5432/ai_messaging_db"
-   API_KEY="your-secret-api-key" # e.g., "my-secret-api-key"
->>>>>>> c71fd3c7e5bcaacee0c65c94704e8468f16b141c
    ```
    Note: The `DATABASE_URL` format is `postgresql://username:password@host:port/database_name`.
 
