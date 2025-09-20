@@ -4,6 +4,9 @@ FROM node:lts-alpine
 # Set the working directory inside the container
 WORKDIR /app
 
+# Install openssl for Prisma
+RUN apk add --no-cache openssl
+
 # Copy package.json and yarn.lock to the working directory
 COPY package.json yarn.lock ./
 
