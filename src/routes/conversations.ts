@@ -1,7 +1,12 @@
-import { Router } from "express";
-import { listConversations, getConversation } from "../controllers/conversationsController";
+import { Router } from 'express';
+import { getAllConversations, getConversationById } from '../controllers/conversationsController';
 
 const router = Router();
-router.get("/", listConversations);
-router.get("/:id", getConversation);
+
+// GET /conversations - Fetch all conversations, with optional status filter
+router.get('/', getAllConversations);
+
+// GET /conversations/:id - Retrieve a single conversation by its ID
+router.get('/:id', getConversationById);
+
 export default router;
