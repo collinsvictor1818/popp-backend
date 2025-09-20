@@ -20,7 +20,7 @@ export async function hasAppliedToJob(candidateId: string, jobId: string) {
   return !!convo;
 }
 
-export async function createCandidateIfNotExists(candidateDTO: any) {
+export async function createCandidateIfNotExists(id: string, candidateDTO: any) {
   const { email_address, phone_number, first_name, last_name } = candidateDTO;
   // Try find by email or phone
   let candidate = await prisma.candidate.findFirst({
@@ -34,6 +34,7 @@ export async function createCandidateIfNotExists(candidateDTO: any) {
   if (!candidate) {
     candidate = await prisma.candidate.create({
       data: {
+        id: id,
         emailAddress: email_address,
         phoneNumber: phone_number,
         firstName: first_name,
@@ -48,7 +49,7 @@ export async function createConversation(event: ApplicationEvent) {
   const { candidate_id, job_id, candidate } = event;
 
   // ensure candidate row exists or create it
-  const dbCandidate = await createCandidateIfNotExists(candidate);
+  const dbCandidate = await createCandidateIfNotExists(candidate_id, candidate);
 
   // Prevent active convos
   if (await hasActiveConversation(dbCandidate.id)) {

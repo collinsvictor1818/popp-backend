@@ -7,7 +7,12 @@ services:
     ports:
       - "5432:5432"  # Maps port 5432 on the host to port 5432 on the container
     volumes:
-      - postgres-data:/var/lib/postgresql/data  # Persists PostgreSQL data in a Docker volume
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5  # Persists PostgreSQL data in a Docker volume
 
   app:
     build: .  # Builds the app service from the Dockerfile in the current directory
@@ -15,9 +20,10 @@ services:
     ports:
       - "3000:3000"  # Maps port 3000 on the host to port 3000 on the container
     depends_on:
-      - db  # Ensures the db service is started before the app service
+      db:
+        condition: service_healthy  # Ensures the db service is started before the app service
     environment:
-      DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@db:5432/postgres  # Sets the database URL for the app
+      DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD}@db:5432/ai_messaging_db  # Sets the database URL for the app
 
 volumes:
   postgres-data:  # Defines a named volume for persisting PostgreSQL data
