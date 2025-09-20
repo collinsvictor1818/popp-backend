@@ -1,31 +1,54 @@
 // src/utils/validation.ts
 
 import { z } from 'zod';
+import { parsePhoneNumber, isValidPhoneNumber as libPhoneIsValid, CountryCode } from 'libphonenumber-js';
 
 /**
- * Validates a phone number based on a basic international format.
- * Assumes format: +<country_code><number> (e.g., +1234567890)
+ * Validates a phone number using libphonenumber-js for robust international validation.
+ * Supports specific country validation and business rules.
  *
  * @param phoneNumber The phone number string to validate.
+ * @param allowedCountries Optional array of allowed country codes (e.g., ['KE', 'US'])
  * @returns True if the phone number is valid, false otherwise.
  */
-export function isValidPhoneNumber(phoneNumber: string): boolean {
+export function isValidPhoneNumber(phoneNumber: string, allowedCountries?: CountryCode[]): boolean {
   if (!phoneNumber || typeof phoneNumber !== 'string') {
     return false;
   }
 
-  // Regex for a basic international phone number format:
-  // Starts with '+'
-  // Followed by 1 to 3 digits for country code
-  // Followed by 7 to 15 digits for the number itself
-  // No spaces or other special characters allowed in the number part
-  const phoneRegex = /^\+[1-9]{1}[0-9]{1,2}[0-9]{7,15}$/;
+  try {
+    // Parse the phone number using libphonenumber-js
+    const parsedNumber = parsePhoneNumber(phoneNumber);
+    
+    // Check if the number is valid
+    if (!libPhoneIsValid(parsedNumber.number)) {
+      return false;
+    }
 
-  // TODO: Consider more robust international phone number validation (e.g., using a library like 'libphonenumber-js')
-  // TODO: Add specific country code validation if required (e.g., only +254 for Kenya)
-  // TODO: Define exact length requirements based on business rules for specific countries
+    // If specific countries are allowed, validate against them
+    if (allowedCountries && allowedCountries.length > 0) {
+      const countryCode = parsedNumber.country;
+      if (!countryCode || !allowedCountries.includes(countryCode)) {
+        return false;
+      }
+    }
 
-  return phoneRegex.test(phoneNumber);
+    return true;
+  } catch (error) {
+    // If parsing fails, the number is invalid
+    return false;
+  }
+}
+
+/**
+ * Validates a phone number specifically for Kenya (+254).
+ * This is a convenience function for business rules that require Kenyan numbers only.
+ *
+ * @param phoneNumber The phone number string to validate.
+ * @returns True if the phone number is a valid Kenyan number, false otherwise.
+ */
+export function isValidKenyanPhoneNumber(phoneNumber: string): boolean {
+  return isValidPhoneNumber(phoneNumber, ['KE']);
 }
 
 // Schema for the nested Candidate object within the webhook payload

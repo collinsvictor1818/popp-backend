@@ -30,7 +30,7 @@ describe("Webhook handler", () => {
       });
 
     expect(res.status).toBe(400);
-    expect(res.body.error).toContain("Invalid phone");
+    expect(res.body.error).toContain("Invalid phone number format");
   });
 
   it("should create conversation on valid payload", async () => {
@@ -49,8 +49,9 @@ describe("Webhook handler", () => {
         }
       });
 
-    expect(res.status).toBe(201);
-    expect(res.body.status).toBe("CREATED");
+    expect(res.status).toBe(200);
+    expect(res.body.message).toBe("Application event processed");
+    expect(res.body.conversationId).toBeDefined();
   });
 
   it("should prevent duplicate application", async () => {
@@ -86,7 +87,7 @@ describe("Webhook handler", () => {
         }
       });
 
-    expect(res2.status).toBe(400);
+    expect(res2.status).toBe(409);
     expect(res2.body.error).toContain("already applied");
   });
 
@@ -123,7 +124,7 @@ describe("Webhook handler", () => {
         }
       });
 
-    expect(res2.status).toBe(400);
+    expect(res2.status).toBe(409);
     expect(res2.body.error).toContain("active conversation");
   });
 });

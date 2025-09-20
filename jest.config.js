@@ -1,11 +1,18 @@
-require('dotenv').config({ path: '.env' });
-
-process.env.DATABASE_URL = process.env.DATABASE_URL || "postgres://postgres:password@localhost:5432/postgres";
-
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  moduleNameMapper: {
+  roots: ['<rootDir>/tests'],
+  testMatch: ['**/*.test.ts'],
+  transform: {
+    '^.+\\.ts$': 'ts-jest',
+  },
+  collectCoverageFrom: [
+    'src/**/*.ts',
+    '!src/**/*.d.ts',
+  ],
+  setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
+  moduleNameMapping: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
+  moduleFileExtensions: ['ts', 'js', 'json'],
 };

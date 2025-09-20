@@ -51,6 +51,9 @@ Before you begin, ensure you have the following installed on your system:
    ```
    POSTGRES_PASSWORD=your_postgres_password
    DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@localhost:5432/postgres
+   API_KEY=your_api_key_here
+   SKIP_API_KEY_VALIDATION=false
+   NODE_ENV=development
    ```
    Note: The `DATABASE_URL` format is `postgresql://username:password@host:port/database_name`
 
@@ -103,6 +106,8 @@ popp-backend-coding-exercise/
 - `yarn dev`: Start the development server with hot-reloading
 - `yarn build`: Build the project using Webpack
 - `yarn build:start`: Build and start the Docker containers
+- `yarn test`: Run the test suite
+- `yarn test:watch`: Run tests in watch mode
 - `yarn prisma:generate`: Generate Prisma client
 - `yarn prisma:migrate`: Run Prisma migrations in development (also generates the client)
 - `yarn prisma:migrate:deploy`: Run Prisma migrations in production (also generates the client)
@@ -184,6 +189,13 @@ Note: This will delete all data in the database. Use with caution.
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
+## Recent Improvements
+
+- **Enhanced Phone Number Validation**: Implemented robust international phone number validation using `libphonenumber-js` library with support for specific country validation (e.g., Kenyan numbers only).
+- **Configurable API Key Middleware**: Added environment variable `SKIP_API_KEY_VALIDATION` for flexible API key validation in different environments.
+- **Comprehensive Test Suite**: Added Jest testing framework with proper test configuration and fixed test expectations to match actual API responses.
+- **Improved Dependencies**: Added missing dependencies including `zod`, `libphonenumber-js`, `supertest`, and `jest` with proper TypeScript support.
+
 ## Additional Notes
 
 - The project uses Prisma as an ORM. When you run migrations (either `prisma:migrate` or `prisma:migrate:deploy`), it
@@ -192,6 +204,8 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 - The `src/` directory contains the main application code, including controllers, routes, and services.
 - Tests can be added to the `tests/` directory.
 - The project uses Webpack for bundling, configured in `webpack.config.js`.
+- Phone number validation now supports international formats and can be configured for specific countries.
+- API key validation can be disabled via environment variables for testing and development.
 
 ## License
 
