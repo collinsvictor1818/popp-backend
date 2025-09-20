@@ -1,6 +1,9 @@
-import { Router } from "express";
-import { webhookApplications } from "../controllers/webhookController";
+import { Router } from 'express';
+import { handleApplicationWebhook } from '../controllers/webhookController';
 
 const router = Router();
-router.post("/webhook/applications", webhookApplications);
+
+// POST /webhook/application - Handles incoming job application events
+router.post('/application', handleApplicationWebhook);
+
 export default router;

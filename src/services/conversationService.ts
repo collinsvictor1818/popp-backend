@@ -58,8 +58,9 @@ export async function createConversation(event: ApplicationEvent) {
     throw err;
   }
 
-  // Prevent duplicate application (candidateId + jobId) even if completed
-  // Because we use unique constraint, attempt to create with try/catch to handle conflict.
+  // Prevent duplicate application (candidateId + jobId) even if completed.
+  // We rely on the database's unique constraint (@@unique([candidateId, jobId]))
+  // and catch the resulting P2002 error for efficient handling.
   try {
     const created = await prisma.conversation.create({
       data: {
