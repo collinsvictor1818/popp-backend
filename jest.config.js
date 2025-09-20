@@ -1,6 +1,4 @@
-require('dotenv').config({ path: '.env' });
-
-process.env.DATABASE_URL = process.env.DATABASE_URL || "postgres://postgres:password@localhost:5432/postgres";
+console.log("Loading jest.config.js...");
 
 module.exports = {
   preset: 'ts-jest',
@@ -8,4 +6,10 @@ module.exports = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
+  roots: ['<rootDir>/tests'],
+  testMatch: ['<rootDir>/tests/**/*.test.ts'],
+  transform: {
+    '^.+\.ts$': 'ts-jest',
+  },
+  moduleFileExtensions: ['ts', 'js', 'json', 'node'],
 };
