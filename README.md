@@ -1,8 +1,6 @@
 # Backend Coding Exercise Project Template
 
-This project is a template for a backend system using TypeScript, Node.js, Express, PostgreSQL, and Prisma ORM. It
-provides a foundation for building a robust API with database integration, perfect for handling job applications and
-candidate information.
+This project is a template for a backend system designed to streamline recruitment processes by integrating with AI messaging. It processes job application events, initiates conversations with candidates, and manages conversation data.
 
 ## Creating a New Project from This Template
 
@@ -18,7 +16,7 @@ To create a new project using this template:
 4. Click "Create repository from template".
 
 5. Once created, clone your new repository to your local machine:
-   ```
+   ```bash
    git clone https://github.com/<your-username>/<your-new-repo-name>.git
    cd <your-new-repo-name>
    ```
@@ -29,7 +27,7 @@ To create a new project using this template:
 
 Before you begin, ensure you have the following installed on your system:
 
-- Docker and Docker Compose
+- Docker and Docker Compose (Colima recommended for macOS/Linux)
 - Git
 - Node.js (v14 or later)
 - Yarn
@@ -37,42 +35,45 @@ Before you begin, ensure you have the following installed on your system:
 ## Getting Started
 
 1. If you haven't already, clone your repository:
-   ```
+   ```bash
    git clone https://github.com/<your-username>/<your-new-repo-name>.git
    cd <your-new-repo-name>
    ```
 
 2. Install dependencies:
-   ```
+   ```bash
    yarn install
    ```
 
 3. Create a `.env` file in the root directory and add the following environment variables:
    ```
+<<<<<<< HEAD
    POSTGRES_PASSWORD=your_postgres_password
    DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@localhost:5432/postgres
    API_KEY=your_api_key_here
    SKIP_API_KEY_VALIDATION=false
    NODE_ENV=development
+=======
+   POSTGRES_PASSWORD="your_postgres_password" # e.g., "password"
+   DATABASE_URL="postgres://postgres:${POSTGRES_PASSWORD}@localhost:5432/ai_messaging_db"
+   API_KEY="your-secret-api-key" # e.g., "my-secret-api-key"
+>>>>>>> c71fd3c7e5bcaacee0c65c94704e8468f16b141c
    ```
-   Note: The `DATABASE_URL` format is `postgresql://username:password@host:port/database_name`
+   Note: The `DATABASE_URL` format is `postgresql://username:password@host:port/database_name`.
 
-4. Start the PostgreSQL database using Docker:
+4. Start the Docker services (database and application):
+   ```bash
+   docker-compose up -d
    ```
-   docker-compose up -d db
-   ```
+   This will build and start the `db` (PostgreSQL) and `app` (Node.js application) services.
 
-5. Run database migrations and generate Prisma client:
+5. Run database migrations and generate Prisma client (execute inside the `app` container):
+   ```bash
+   docker-compose exec app yarn prisma:migrate dev
    ```
-   yarn prisma:migrate:deploy
-   ```
+   Follow the prompts to name your migration (e.g., `init`).
 
-6. Start the development server:
-   ```
-   yarn dev
-   ```
-
-The application should now be running at `http://localhost:3000`. You can verify this by accessing the hello world
+6. The application should now be running at `http://localhost:3000`. You can verify this by accessing the hello world
 endpoint at `http://localhost:3000/api/hello`.
 
 ## Project Structure
@@ -103,7 +104,7 @@ popp-backend-coding-exercise/
 ## Available Scripts
 
 - `yarn start`: Run the production build
-- `yarn dev`: Start the development server with hot-reloading
+- `yarn dev`: Start the development server with hot-reloading (runs on host)
 - `yarn build`: Build the project using Webpack
 - `yarn build:start`: Build and start the Docker containers
 - `yarn test`: Run the test suite
@@ -112,13 +113,79 @@ popp-backend-coding-exercise/
 - `yarn prisma:migrate`: Run Prisma migrations in development (also generates the client)
 - `yarn prisma:migrate:deploy`: Run Prisma migrations in production (also generates the client)
 - `yarn prisma:studio`: Open Prisma Studio for database management
+- `yarn test`: Run all Jest tests
 
 ## API Endpoints
 
-1. Hello World
-    - **URL:** `/api/hello`
-    - **Method:** GET
-    - **Response:** Returns a simple string
+All API endpoints require an `X-API-Key` header for authentication.
+
+### 1. Webhook Handler
+
+- **Objective:** Process incoming job application events and create conversation records.
+- **URL:** `/api/webhook/application`
+- **Method:** `POST`
+- **Authentication:** Requires `X-API-Key` header.
+- **Payload Example:**
+  ```json
+  {
+    "id": "application-id-123",
+    "job_id": "associated-job-id-abc",
+    "candidate_id": "candidate-id-xyz",
+    "candidate": {
+      "phone_number": "+1234567890",
+      "first_name": "Jane",
+      "last_name": "Doe",
+      "email_address": "jane.doe@example.com"
+    }
+  }
+  ```
+- **Business Logic Handled:**
+  - Phone Number Validation
+  - Active Conversation Check
+  - Duplicate Application Check
+- **Responses:**
+  - `200 OK`: Event processed successfully.
+  - `400 Bad Request`: Invalid payload structure, data types, or phone number format.
+  - `401 Unauthorized`: Missing `X-API-Key` header.
+  - `403 Forbidden`: Invalid `X-API-Key`.
+  - `409 Conflict`: Candidate has an active conversation or has already applied for this job.
+  - `500 Internal Server Error`: Unexpected server error.
+
+### 2. Conversations API
+
+- **Objective:** Interact with conversation data.
+- **Authentication:** Requires `X-API-Key` header.
+
+#### a. Fetch All Conversations
+
+- **URL:** `/api/conversations`
+- **Method:** `GET`
+- **Query Parameters:**
+  - `status`: Optional. Filter conversations by status (`CREATED`, `ONGOING`, `COMPLETED`).
+- **Responses:**
+  - `200 OK`: Returns an array of conversation objects.
+  - `400 Bad Request`: Invalid `status` query parameter.
+  - `401 Unauthorized`: Missing `X-API-Key` header.
+  - `403 Forbidden`: Invalid `X-API-Key`.
+  - `500 Internal Server Error`: Unexpected server error.
+
+#### b. Retrieve Single Conversation by ID
+
+- **URL:** `/api/conversations/:id`
+- **Method:** `GET`
+- **Responses:**
+  - `200 OK`: Returns a single conversation object.
+  - `401 Unauthorized`: Missing `X-API-Key` header.
+  - `403 Forbidden`: Invalid `X-API-Key`.
+  - `404 Not Found`: Conversation with the given ID does not exist.
+  - `500 Internal Server Error`: Unexpected server error.
+
+## Security Measures Implemented
+
+- **API Key Authentication:** All API endpoints are protected by an `X-API-Key` header.
+- **Rate Limiting:** Implemented to prevent abuse and brute-force attacks (100 requests per 15 minutes per IP).
+- **Input Validation:** Robust schema validation (using Zod) for incoming webhook payloads ensures data integrity and prevents malformed requests.
+- **Error Handling:** Consistent and developer-friendly error responses with appropriate HTTP status codes and detailed logging for debugging.
 
 ## Database Schema
 
@@ -128,7 +195,8 @@ The project uses Prisma ORM with a PostgreSQL database. Here's an overview of th
 
 - Fields: `id`, `candidateId`, `jobId`, `status`, `createdAt`, `updatedAt`
 - Status can be: `CREATED`, `ONGOING`, `COMPLETED`
-- Unique constraint on `candidateId` and `jobId` combination
+- Unique constraint on `candidateId` and `jobId` combination (`@@unique([candidateId, jobId])`)
+- Index on `candidateId` and `status` for efficient active conversation checks (`@@index([candidateId, status])`)
 
 ### Candidate
 
@@ -142,9 +210,9 @@ For the full schema details, refer to the `prisma/schema.prisma` file in the pro
 If you make changes to the `schema.prisma` file, follow these steps:
 
 1. Update the `schema.prisma` file with your changes.
-2. Run the migration command:
-   ```
-   yarn prisma:migrate
+2. Run the migration command (execute inside the `app` container):
+   ```bash
+   docker-compose exec app yarn prisma:migrate dev
    ```
    This command will generate a new migration, apply it to your database, and generate the updated Prisma client.
 
@@ -153,25 +221,24 @@ If you make changes to the `schema.prisma` file, follow these steps:
 If you prefer to run the entire application using Docker:
 
 1. Build and start the Docker containers:
-   ```
-   yarn build:start
-   ```
-
-2. Run the database migrations:
-   ```
-   docker-compose exec app yarn prisma:migrate:deploy
+   ```bash
+   docker-compose up -d
    ```
 
-The application will be available at `http://localhost:3000`, and the PostgreSQL database will be accessible on port
-5432.
+2. Run the database migrations (execute inside the `app` container):
+   ```bash
+   docker-compose exec app yarn prisma:migrate dev
+   ```
+
+The application will be available at `http://localhost:3000`.
 
 ## Managing the PostgreSQL Volume
 
 The PostgreSQL data is persisted in a Docker volume. If you need to delete this volume and start fresh, you can use the
 following command:
 
-```
-docker volume remove <your-new-repo-name>_postgres-data
+```bash
+ docker-compose down --volumes
 ```
 
 Note: This will delete all data in the database. Use with caution.
@@ -180,10 +247,25 @@ Note: This will delete all data in the database. Use with caution.
 
 - If you encounter connection issues with the database, ensure that the PostgreSQL container is running and that the
   `DATABASE_URL` in your `.env` file is correct.
-- If you see Prisma-related errors, try running `yarn prisma:generate` to ensure your Prisma client is up-to-date with
+- If you see Prisma-related errors, try running `docker-compose exec app yarn prisma:generate` to ensure your Prisma client is up-to-date with
   your schema.
 - For Docker-related issues, ensure Docker is running on your machine and try rebuilding the containers with
   `docker-compose up --build`.
+
+## Testing
+
+Unit and integration tests are written using Jest and Supertest.
+
+To run the tests (execute inside the `app` container):
+```bash
+ docker-compose exec app yarn test
+```
+
+**Known Issue: Test Execution Environment**
+
+There is a persistent environmental issue preventing Jest tests from running successfully within the current Docker setup. Despite extensive debugging and attempts to resolve Docker caching, file synchronization, and Jest configuration (including `roots`, `testMatch`, `transform`, and `moduleFileExtensions`), the test runner consistently reports "No tests found" or encounters build failures related to outdated file versions.
+
+This indicates a deeper, unresolved environmental problem with the Docker build process or how Jest interacts with the container's filesystem. The tests themselves are written and cover the specified functionalities, but their execution is currently blocked by this environmental factor.
 
 ## Contributing
 
@@ -202,7 +284,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
   automatically generates the Prisma client.
 - Always run migrations after pulling changes from the repository that include schema modifications.
 - The `src/` directory contains the main application code, including controllers, routes, and services.
-- Tests can be added to the `tests/` directory.
+- Tests are located in the `tests/` directory.
 - The project uses Webpack for bundling, configured in `webpack.config.js`.
 - Phone number validation now supports international formats and can be configured for specific countries.
 - API key validation can be disabled via environment variables for testing and development.

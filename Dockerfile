@@ -16,6 +16,9 @@ COPY prisma ./prisma
 # Install dependencies
 RUN yarn install --frozen-lockfile
 
+# Force remove the problematic file before copying to avoid caching issues
+RUN rm -f src/middleware/apiKey.ts
+
 # Copy the rest of the application code to the working directory
 COPY . .
 
