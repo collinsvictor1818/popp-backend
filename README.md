@@ -2,8 +2,7 @@
 
 This project is a template for a backend system using TypeScript, Node.js, Express, PostgreSQL, and Prisma ORM. It
 provides a foundation for building a robust API with database integration, perfect for handling job applications and
-candidate information. For comprehensive guidance on integration, including details on AWS services like EventBridge,
-AppSync, ECS, Fargate, DynamoDB, and GraphQL, please refer to the [documentation directory](./docs).
+candidate information.
 
 ## Creating a New Project from This Template
 
@@ -75,10 +74,6 @@ Before you begin, ensure you have the following installed on your system:
 
 The application should now be running at `http://localhost:3000`. You can verify this by accessing the hello world
 endpoint at `http://localhost:3000/api/hello`.
-
-## Documentation
-
-For detailed information on how to integrate with this application, including API endpoints, authentication, and an overview of the application's architecture, please refer to our [Integration Guide](docs/integration.md).
 
 ## Project Structure
 
