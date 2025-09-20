@@ -5,6 +5,10 @@ import { Request, Response, NextFunction } from 'express';
 const API_KEY = process.env.API_KEY;
 
 export const apiKeyMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  // Debugging logs
+  console.log('Middleware: process.env.API_KEY:', process.env.API_KEY);
+  console.log('Middleware: req.headers[\'x-api-key\']:', req.headers['x-api-key']);
+
   // Allow requests without API_KEY in development environment for easier testing
   // TODO: Make this configurable or remove for production
   if (process.env.NODE_ENV === 'development' && !API_KEY) {
